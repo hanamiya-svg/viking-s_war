@@ -1,46 +1,113 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Audio;
 
 public class AudioManager : MonoBehaviour
 {
-	public AudioMixer audioMixer;
-	public AudioMixerSnapshot gameplaySnapshot, endMatchSnapshot;
-	public AudioClip appearSFX;
+    [Header("Mixer")]
+    public AudioMixer audioMixer;
+    public AudioMixerSnapshot gameplaySnapshot;
+    public AudioMixerSnapshot endMatchSnapshot;
 
-	private AudioSource audioSource;
+    [Header("Music")]
+    public AudioClip musicClip;
 
-	private void Awake()
-	{
-		audioSource = GetComponent<AudioSource>();
-	}
+    [Header("SFX")]
+    public AudioClip appearSFX;
 
-	public void GoToDefaultSnapshot()
-	{
-		ChangeSnapshots(1f, 0f, .1f);
-	}
+    private AudioSource musicSource;
+    private AudioSource sfxSource;
 
-	public void GoToEndMatchSnapshot()
-	{
-		ChangeSnapshots(0f, 1f, 1f);
-	}
-
-	private void ChangeSnapshots(float gameplayWeight, float endMatchWeight, float time)
-	{	
-		//AudioMixerSnapshot[] snaps = new AudioMixerSnapshot[]{gameplaySnapshot, endMatchSnapshot};
-		//float[] weights = new float[]{gameplayWeight, endMatchWeight};
-		//audioMixer.TransitionToSnapshots(snaps, weights, time);
-	}
-
-	public void PlayAppearSFX(Vector3 location)
-	{
-		//PlayOneShotSFX(location, appearSFX);
-	}
-
-    private void PlayOneShotSFX(Vector3 location, AudioClip clip)
+    private void Awake()
     {
-		transform.position = location;
-        //audioSource.PlayOneShot(clip, 1f);
+        // Music source
+        musicSource = gameObject.AddComponent<AudioSource>();
+        musicSource.clip = musicClip;
+        musicSource.loop = true;
+        musicSource.spatialBlend = 0f; // 2D
+        musicSource.volume = 1f;
+
+        // SFX source
+        sfxSource = gameObject.AddComponent<AudioSource>();
+        sfxSource.spatialBlend = 0f; // 2D
+        sfxSource.volume = 1f;
+    }
+
+    private void Start()
+    {
+        PlayMusic();
+        GoToDefaultSnapshot();
+    }
+
+    /* =======================
+       MUSIC
+       ======================= */
+
+    public void PlayMusic()
+    {
+        if (musicClip == null)
+        {
+            Debug.LogError("AudioManager: Music clip not assigned");
+            return;
+        }
+
+        if (!musicSource.isPlaying)
+            musicSource.Play();
+    }
+
+    public void StopMusic()
+    {
+        if (musicSource.isPlaying)
+            musicSource.Stop();
+    }
+
+    /* =======================
+       SNAPSHOTS
+       ======================= */
+
+    public void GoToDefaultSnapshot()
+    {
+        TransitionSnapshots(1f, 0f, 0.1f);
+    }
+
+    public void GoToEndMatchSnapshot()
+    {
+        TransitionSnapshots(0f, 1f, 1f);
+    }
+
+    private void TransitionSnapshots(float gameplayWeight, float endMatchWeight, float time)
+    {
+        if (audioMixer == null || gameplaySnapshot == null || endMatchSnapshot == null)
+            return;
+
+        AudioMixerSnapshot[] snaps =
+        {
+            gameplaySnapshot,
+            endMatchSnapshot
+        };
+
+        float[] weights =
+        {
+            gameplayWeight,
+            endMatchWeight
+        };
+
+        audioMixer.TransitionToSnapshots(snaps, weights, time);
+    }
+
+    /* =======================
+       SFX
+       ======================= */
+
+    public void PlayAppearSFX(Vector3 location)
+    {
+        PlayOneShot(appearSFX);
+    }
+
+    private void PlayOneShot(AudioClip clip)
+    {
+        if (clip == null)
+            return;
+
+        sfxSource.PlayOneShot(clip, 1f);
     }
 }

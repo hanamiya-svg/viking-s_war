@@ -122,7 +122,7 @@ namespace UnityRoyale
         protected virtual void Die()
         {
             state = States.Dead;
-			//audioSource.pitch = Random.Range(.9f, 1.1f);
+			audioSource.pitch = Random.Range(.9f, 1.1f);
 			//audioSource.PlayOneShot(dieAudioClip, 1f);
 
 			if(OnDie != null)

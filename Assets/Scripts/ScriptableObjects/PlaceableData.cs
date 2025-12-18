@@ -16,9 +16,9 @@ namespace UnityRoyale
         public ThinkingPlaceable.AttackType attackType = ThinkingPlaceable.AttackType.Melee;
         public Placeable.PlaceableTarget targetType = Placeable.PlaceableTarget.Both;
         public float attackRatio = 1f; //time between attacks
-        public float damagePerAttack = 2f; //damage each attack deals
+        public float damagePerAttack = 1f; //damage each attack deals
         public float attackRange = 1f;
-        public float hitPoints = 10f; //when units or buildings suffer damage, they lose hitpoints
+        public float hitPoints = 1f; //when units or buildings suffer damage, they lose hitpoints
 		public AudioClip attackClip, dieClip;
 
         [Header("Units")]
